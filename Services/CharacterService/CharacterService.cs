@@ -24,7 +24,7 @@ namespace dotnet7rpg.Services.CharacterService
             var serviceResponse = new ServiceResponse<List<GetCharacterDto>>();
             var character = _mapper.Map<Character>(newCharacter);
             character.Id = characters.Max(c => c.Id) + 1;
-            characters.Add(character);
+            await _context.Characters.AddAsync(character);
             serviceResponse.Data = characters.Select(c => _mapper.Map<GetCharacterDto>(c)).ToList();
             return serviceResponse;
         }
@@ -33,13 +33,12 @@ namespace dotnet7rpg.Services.CharacterService
         {
             var serviceResponse = new ServiceResponse<List<GetCharacterDto>>();
             
-            
             try{
-            var character = characters.FirstOrDefault(c => c.Id == id);
+            var character = await _context.Characters.FirstOrDefaultAsync(c => c.Id == id);
             if(character is null)
                 throw new Exception($"Character with Id '{id}' not found.");
             
-           characters.Remove(character);
+           _context.Characters.Remove(character);
 
             serviceResponse.Data = characters.Select(c => _mapper.Map<GetCharacterDto>(c)).ToList();
             }
@@ -72,7 +71,7 @@ namespace dotnet7rpg.Services.CharacterService
             
             
             try{
-            var character = characters.FirstOrDefault(c => c.Id == updatedCharacter.Id);
+            var character = await _context.Characters.FirstOrDefaultAsync(c => c.Id == updatedCharacter.Id);
             if(character is null)
                 throw new Exception($"Character with Id '{updatedCharacter.Id}' not found.");
             
